@@ -15,6 +15,7 @@ import com.example.themealapp.R
 import com.example.themealapp.data.DataSourceImpl
 import com.example.themealapp.data.model.Hit
 import com.example.themealapp.data.model.RecipeEntity
+import com.example.themealapp.databinding.FragmentMainBinding
 import com.example.themealapp.domain.RepoImpl
 import com.example.themealapp.ui.viewmodel.MainViewModel
 import com.example.themealapp.ui.viewmodel.VMFactory
@@ -24,6 +25,10 @@ import kotlinx.android.synthetic.main.fragment_main.*
 class MainFragment : Fragment(), MainAdapter.OnRecipeClickListener {
 
     private val viewModel by viewModels<MainViewModel> { VMFactory(RepoImpl(DataSourceImpl(AppDatabase.getDatabase(requireActivity().applicationContext)))) }
+    private var _binding: FragmentMainBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +39,8 @@ class MainFragment : Fragment(), MainAdapter.OnRecipeClickListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_main, container, false)
+        _binding = FragmentMainBinding.inflate(inflater,container,false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,14 +73,20 @@ class MainFragment : Fragment(), MainAdapter.OnRecipeClickListener {
         viewModel.fetchRecipesList.observe(viewLifecycleOwner, Observer { result ->
             when(result) {
                 is Resource.Loading -> {
-                    progressBar.visibility = View.VISIBLE
+                    binding.emptyContainer.root.visibility = View.GONE
+                    binding.progressBar.visibility = View.VISIBLE
                 }
                 is Resource.Success -> {
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
+                    if (result.data.isEmpty()) {
+                        binding.emptyContainer.root.visibility = View.VISIBLE
+                        return@Observer
+                    }
                     rv_recipes.adapter = MainAdapter(requireContext(), result.data, this)
+                    binding.emptyContainer.root.visibility = View.GONE
                 }
                 is Resource.Failure -> {
-                    progressBar.visibility = View.GONE
+                    binding.progressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), "Ocurrió un error al traer los datos de la lista ${result.exception}", Toast.LENGTH_LONG).show()
                 }
             }
@@ -82,7 +94,7 @@ class MainFragment : Fragment(), MainAdapter.OnRecipeClickListener {
     }
 
     private fun setupSearchView() {
-        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+        binding.searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 viewModel.setRecipe(query!!)
                 return false
@@ -96,14 +108,19 @@ class MainFragment : Fragment(), MainAdapter.OnRecipeClickListener {
     }
 
     private fun setupRecyclerView() {
-        rv_recipes.layoutManager = LinearLayoutManager(requireContext())
-        rv_recipes.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.rvRecipes.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvRecipes.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
     }
 
     override fun onRecipeClick(recipe: Hit, position: Int) {
         val bundle = Bundle()
         bundle.putParcelable("recipe", recipe.recipe)
         findNavController().navigate(R.id.action_mainFragment_to_detailsFragment, bundle)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

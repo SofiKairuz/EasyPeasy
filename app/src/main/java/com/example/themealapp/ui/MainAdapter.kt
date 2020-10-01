@@ -15,6 +15,7 @@ import com.bumptech.glide.request.target.Target
 import com.example.themealapp.R
 import com.example.themealapp.base.BaseViewHolder
 import com.example.themealapp.data.model.Hit
+import com.example.themealapp.databinding.RecipesRowBinding
 import kotlinx.android.synthetic.main.recipes_row.view.*
 
 class MainAdapter(private val context: Context, private var recipesList: List<Hit>,
@@ -26,7 +27,15 @@ class MainAdapter(private val context: Context, private var recipesList: List<Hi
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder<*> {
-        return MainViewHolder(LayoutInflater.from(context).inflate(R.layout.recipes_row, parent, false))
+        val itemBinding = RecipesRowBinding.inflate(LayoutInflater.from(context), parent, false)
+        val vh = MainViewHolder(itemBinding)
+        vh.itemView.setOnClickListener {
+            val pos = vh.adapterPosition
+            if (pos != NO_POSITION) {
+                itemClickListener.onRecipeClick(recipesList[pos],pos)
+            }
+        }
+        return vh
     }
 
     override fun getItemCount(): Int {
@@ -39,24 +48,24 @@ class MainAdapter(private val context: Context, private var recipesList: List<Hi
         }
     }
 
-    inner class MainViewHolder(itemView: View): BaseViewHolder<Hit>(itemView) {
+    private inner class MainViewHolder(val binding: RecipesRowBinding): BaseViewHolder<Hit>(binding.root) {
         @SuppressLint("SetTextI18n")
-        override fun bind(item: Hit, position: Int) {
+        override fun bind(item: Hit, position: Int) = with(binding) {
             Glide.with(context).load(item.recipe.image).listener(object: RequestListener<Drawable> {
                 override fun onLoadFailed(e: GlideException?,model: Any?,target: Target<Drawable>?,isFirstResource: Boolean): Boolean
                 {
-                    itemView.img_recipe.setImageResource(R.drawable.ic_baseline_not_interested_24)
+                    imgRecipe.setImageResource(R.drawable.ic_baseline_not_interested_24)
                     return true
                 }
                 override fun onResourceReady(resource: Drawable?, model: Any?, target: Target<Drawable>?, dataSource: DataSource?, isFirstResource: Boolean): Boolean
                 {
                     return false
                 }
-            }).into(itemView.img_recipe);
-            itemView.txt_title.text = item.recipe.name
-            itemView.txt_description.text = "Receta de ${item.recipe.source}"
+            }).into(imgRecipe);
+            txtTitle.text = item.recipe.name
+            txtDescription.text = "Receta de ${item.recipe.source}"
             item.recipe.ingredients.forEach {
-                itemView.txt_ingredients.text = itemView.txt_ingredients.text.toString() + it.text + ". "
+                txtIngredients.text = txtIngredients.text.toString() + it.text + ". "
             }
             itemView.setOnClickListener { itemClickListener.onRecipeClick(item, position) }
         }

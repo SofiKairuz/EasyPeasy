@@ -6,6 +6,10 @@
     tools:context=".ui.myrecipes.MyRecipesFragment"
     android:orientation="vertical">
 
+    <include android:id="@+id/my_empty_container"
+        android:visibility="gone"
+        layout="@layout/empty_container"/>
+
     <RelativeLayout
         android:id="@+id/my_progressBar"
         android:layout_width="match_parent"

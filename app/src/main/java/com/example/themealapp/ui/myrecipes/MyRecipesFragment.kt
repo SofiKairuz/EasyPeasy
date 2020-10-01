@@ -14,6 +14,8 @@ import com.example.themealapp.AppDatabase
 import com.example.themealapp.R
 import com.example.themealapp.data.DataSourceImpl
 import com.example.themealapp.data.model.*
+import com.example.themealapp.databinding.FragmentFavoritesBinding
+import com.example.themealapp.databinding.FragmentMyRecipesBinding
 import com.example.themealapp.domain.RepoImpl
 import com.example.themealapp.ui.viewmodel.MainViewModel
 import com.example.themealapp.ui.viewmodel.VMFactory
@@ -30,6 +32,10 @@ class MyRecipesFragment : Fragment(), MyRecipesAdapter.OnRecipeClickListener {
                 AppDatabase.getDatabase(requireActivity().applicationContext))
         )
     ) }
+    private var _binding: FragmentMyRecipesBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +46,8 @@ class MyRecipesFragment : Fragment(), MyRecipesAdapter.OnRecipeClickListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_my_recipes, container, false)
+        _binding = FragmentMyRecipesBinding.inflate(inflater, container,false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -50,23 +57,28 @@ class MyRecipesFragment : Fragment(), MyRecipesAdapter.OnRecipeClickListener {
     }
 
     private fun setupRecyclerView() {
-        rv_my_recipes.layoutManager = LinearLayoutManager(requireContext())
-        rv_my_recipes.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.rvMyRecipes.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvMyRecipes.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
     }
 
     private fun setupObservers() {
         viewModel.getMyRecipes().observe(viewLifecycleOwner, Observer { result ->
             when(result) {
                 is Resource.Loading -> {
-                    my_progressBar.visibility = View.VISIBLE
+                    binding.myProgressBar.visibility = View.VISIBLE
+                    binding.myEmptyContainer.root.visibility = View.GONE
                 }
                 is Resource.Success -> {
-                    my_progressBar.visibility = View.GONE
-                    Log.d("MYRECIPES","${result.data}")
+                    binding.myProgressBar.visibility = View.GONE
+                    if (result.data.isEmpty()) {
+                        binding.myEmptyContainer.root.visibility = View.VISIBLE
+                        return@Observer
+                    }
                     onSuccessResource(result.data)
                 }
                 is Resource.Failure -> {
-                    my_progressBar.visibility = View.GONE
+                    binding.myProgressBar.visibility = View.GONE
+                    binding.myEmptyContainer.root.visibility = View.GONE
                     Toast.makeText(requireContext(), "Ocurrió un error al traer los datos de la lista ${result.exception}", Toast.LENGTH_LONG).show()
                 }
             }
@@ -74,7 +86,7 @@ class MyRecipesFragment : Fragment(), MyRecipesAdapter.OnRecipeClickListener {
     }
 
     private fun onSuccessResource(entity: List<RecipeEntity>) {
-        rv_my_recipes.adapter =
+        binding.rvMyRecipes.adapter =
             MyRecipesAdapter(
                 requireContext(),
                 entity,
@@ -111,20 +123,30 @@ class MyRecipesFragment : Fragment(), MyRecipesAdapter.OnRecipeClickListener {
         viewModel.deleteMyRecipe(recipe).observe(viewLifecycleOwner, Observer { result ->
             when(result) {
                 is Resource.Loading -> {
-                    my_progressBar.visibility = View.VISIBLE
+                    binding.myProgressBar.visibility = View.VISIBLE
+                    binding.myEmptyContainer.root.visibility = View.GONE
                 }
                 is Resource.Success -> {
-                    my_progressBar.visibility = View.GONE
+                    binding.myProgressBar.visibility = View.GONE
+                    if (result.data.isEmpty()) {
+                        binding.myEmptyContainer.root.visibility = View.VISIBLE
+                        return@Observer
+                    }
                     onSuccessResource(result.data)
-                    rv_my_recipes.adapter?.notifyDataSetChanged()
-                    Toast.makeText(requireContext(), "Se eliminó el registro correctamente", Toast.LENGTH_LONG).show()
+                    binding.rvMyRecipes.adapter?.notifyDataSetChanged()
+                    Toast.makeText(requireContext(), "Se eliminó el registro correctamente", Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Failure -> {
-                    my_progressBar.visibility = View.GONE
+                    binding.myProgressBar.visibility = View.GONE
+                    binding.myEmptyContainer.root.visibility = View.GONE
                     Toast.makeText(requireContext(), "Ocurrió un error al eliminar el registro. ${result.exception}", Toast.LENGTH_LONG).show()
                 }
             }
         })
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
+    }
 }

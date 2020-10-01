@@ -6,6 +6,10 @@
     tools:context=".ui.recipefavorites.FavoritesFragment"
     android:orientation="vertical">
 
+    <include android:id="@+id/fav_empty_container"
+        android:visibility="gone"
+        layout="@layout/empty_container"/>
+
     <RelativeLayout
         android:id="@+id/fav_progressBar"
         android:layout_width="match_parent"

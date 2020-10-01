@@ -16,6 +16,7 @@ import com.example.themealapp.AppDatabase
 import com.example.themealapp.R
 import com.example.themealapp.data.DataSourceImpl
 import com.example.themealapp.data.model.*
+import com.example.themealapp.databinding.FragmentFavoritesBinding
 import com.example.themealapp.domain.RepoImpl
 import com.example.themealapp.ui.MainAdapter
 import com.example.themealapp.ui.viewmodel.MainViewModel
@@ -27,6 +28,10 @@ import kotlinx.android.synthetic.main.fragment_favorites.*
 class FavoritesFragment : Fragment(), FavoritesAdapter.OnRecipeClickListener {
 
     private val viewModel by viewModels<MainViewModel> { VMFactory(RepoImpl(DataSourceImpl(AppDatabase.getDatabase(requireActivity().applicationContext)))) }
+    private var _binding: FragmentFavoritesBinding? = null
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +41,8 @@ class FavoritesFragment : Fragment(), FavoritesAdapter.OnRecipeClickListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_favorites, container, false)
+        _binding = FragmentFavoritesBinding.inflate(inflater, container,false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -49,27 +55,33 @@ class FavoritesFragment : Fragment(), FavoritesAdapter.OnRecipeClickListener {
         viewModel.getFavorites().observe(viewLifecycleOwner, Observer { result ->
             when(result) {
                 is Resource.Loading -> {
-                    fav_progressBar.visibility = View.VISIBLE
+                    binding.favProgressBar.visibility = View.VISIBLE
+                    binding.favEmptyContainer.root.visibility = View.GONE
                 }
                 is Resource.Success -> {
-                    fav_progressBar.visibility = View.GONE
+                    binding.favProgressBar.visibility = View.GONE
+                    if (result.data.isEmpty()) {
+                        binding.favEmptyContainer.root.visibility = View.VISIBLE
+                        return@Observer
+                    }
                     onSuccessResource(result.data)
                 }
                 is Resource.Failure -> {
-                    fav_progressBar.visibility = View.GONE
+                    binding.favProgressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), "Ocurrió un error al traer los datos de la lista ${result.exception}", Toast.LENGTH_LONG).show()
+                    binding.favEmptyContainer.root.visibility = View.GONE
                 }
             }
         })
     }
 
     private fun setupRecyclerView() {
-        rv_fav_recipes.layoutManager = LinearLayoutManager(requireContext())
-        rv_fav_recipes.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
+        binding.rvFavRecipes.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvFavRecipes.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
     }
 
     private fun onSuccessResource(entity: List<RecipeEntity>) {
-        rv_fav_recipes.adapter = FavoritesAdapter(requireContext(), entity, this)
+        binding.rvFavRecipes.adapter = FavoritesAdapter(requireContext(), entity, this)
     }
 
     override fun onRecipeClick(recipe: RecipeEntity, position: Int) {
@@ -82,19 +94,30 @@ class FavoritesFragment : Fragment(), FavoritesAdapter.OnRecipeClickListener {
         viewModel.deleteFavorite(recipe).observe(viewLifecycleOwner, Observer { result ->
             when(result) {
                 is Resource.Loading -> {
-                    fav_progressBar.visibility = View.VISIBLE
+                    binding.favProgressBar.visibility = View.VISIBLE
+                    binding.favEmptyContainer.root.visibility = View.GONE
                 }
                 is Resource.Success -> {
-                    fav_progressBar.visibility = View.GONE
+                    binding.favProgressBar.visibility = View.GONE
+                    if (result.data.isEmpty()) {
+                        binding.favEmptyContainer.root.visibility = View.VISIBLE
+                        return@Observer
+                    }
                     onSuccessResource(result.data)
-                    rv_fav_recipes.adapter?.notifyDataSetChanged()
-                    Toast.makeText(requireContext(), "Se eliminó el registro correctamente", Toast.LENGTH_LONG).show()
+                    binding.rvFavRecipes.adapter?.notifyDataSetChanged()
+                    Toast.makeText(requireContext(), "Se eliminó el registro correctamente", Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Failure -> {
-                    fav_progressBar.visibility = View.GONE
+                    binding.favProgressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), "Ocurrió un error al eliminar el registro. ${result.exception}", Toast.LENGTH_LONG).show()
+                    binding.favEmptyContainer.root.visibility = View.GONE
                 }
             }
         })
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 }
