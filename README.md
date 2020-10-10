@@ -15,6 +15,7 @@ Kotlin
 - Retrofit
 - Room
 - Navigation Components
+- ViewBinding
 
 # Arquitectura
 ![Architecture Example](https://developer.android.com/topic/libraries/architecture/images/final-architecture.png)
