@@ -19,6 +19,7 @@ import com.example.themealapp.databinding.FragmentMainBinding
 import com.example.themealapp.domain.RepoImpl
 import com.example.themealapp.ui.viewmodel.MainViewModel
 import com.example.themealapp.ui.viewmodel.VMFactory
+import com.example.themealapp.utils.Utils
 import com.example.themealapp.vo.Resource
 import kotlinx.android.synthetic.main.fragment_main.*
 
@@ -56,6 +57,7 @@ class MainFragment : Fragment(), MainAdapter.OnRecipeClickListener {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Utils.hideKeyboard(this.requireActivity())
         return when(item.itemId){
             R.id.favorites -> {
                 findNavController().navigate(R.id.action_mainFragment_to_favoritesFragment)
@@ -113,6 +115,7 @@ class MainFragment : Fragment(), MainAdapter.OnRecipeClickListener {
     }
 
     override fun onRecipeClick(recipe: Hit, position: Int) {
+        Utils.hideKeyboard(this.requireActivity())
         val bundle = Bundle()
         bundle.putParcelable("recipe", recipe.recipe)
         findNavController().navigate(R.id.action_mainFragment_to_detailsFragment, bundle)
@@ -120,6 +123,7 @@ class MainFragment : Fragment(), MainAdapter.OnRecipeClickListener {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        Utils.hideKeyboard(this.requireActivity())
         _binding = null
     }
 

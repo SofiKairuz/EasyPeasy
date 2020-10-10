@@ -1,17 +1,20 @@
 package com.example.themealapp.ui.newrecipe
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.themealapp.AppDatabase
+import com.example.themealapp.MainActivity
 import com.example.themealapp.R
 import com.example.themealapp.data.DataSourceImpl
 import com.example.themealapp.data.model.Ingredientes
@@ -21,6 +24,7 @@ import com.example.themealapp.domain.RepoImpl
 import com.example.themealapp.ui.viewmodel.MainViewModel
 import com.example.themealapp.ui.viewmodel.VMFactory
 import com.example.themealapp.utils.ImageController
+import com.example.themealapp.utils.Utils
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.fragment_new_recipe.*
 
@@ -30,12 +34,7 @@ class NewRecipeFragment : Fragment() {
     private var recipe: Recipe? = null
     private var recipeID: Int = 0
 
-    private val viewModel by viewModels<MainViewModel> { VMFactory(
-        RepoImpl(
-            DataSourceImpl(
-                AppDatabase.getDatabase(requireActivity().applicationContext))
-        )
-    ) }
+    private val viewModel by viewModels<MainViewModel> { VMFactory(RepoImpl(DataSourceImpl(AppDatabase.getDatabase(requireActivity().applicationContext)))) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +61,7 @@ class NewRecipeFragment : Fragment() {
     }
 
     private fun editRecipeForm() {
+        Utils.hideKeyboard(this.requireActivity())
         txt_new_title.setText(recipe!!.name)
         txt_new_calories.setText(recipe!!.totalCalories)
         txt_new_source.setText(recipe!!.source)
@@ -90,6 +90,7 @@ class NewRecipeFragment : Fragment() {
 
 
     private fun selectLocalImage() {
+        Utils.hideKeyboard(this.requireActivity())
         txt_new_img_gallery.setOnClickListener {
             ImageController.selectPhotoFromGallery(this, ImageController.IMAGE_PICK_CODE)
         }
@@ -97,8 +98,9 @@ class NewRecipeFragment : Fragment() {
 
     private fun cancelNewRecipe() {
         btn_new_cancel.setOnClickListener {
+            Utils.hideKeyboard(this.requireActivity())
             cleanRecipe()
-            navigateToMyRecipes()
+            navigateToMyRecipes(null)
         }
     }
 
@@ -118,12 +120,15 @@ class NewRecipeFragment : Fragment() {
                 val newRecipe = createRecipe()
                 if (imageUri == null) imageRecipe = newRecipe.image
                 var idReceta = viewModel.validateDuplicateRecipe(newRecipe.name, newRecipe.source, imageRecipe, newRecipe.url) ?: 0
-                if (recipeID > 0) idReceta = recipeID
+                if (recipeID > 0) {
+                    idReceta = recipeID
+                }
                 idReceta = viewModel.saveRecipe(RecipeEntity(recipeId = idReceta, name = newRecipe.name, image = newRecipe.image, source = newRecipe.source, ingredients =  Gson().toJson(newRecipe.ingredients), totalCalories = newRecipe.totalCalories, url = newRecipe.url, recipeView = "MY_RECIPES"))!!
                 Toast.makeText(requireContext(), "Se guardó la receta correctamente", Toast.LENGTH_SHORT).show()
                 saveImageToGallery(idReceta)
                 cleanRecipe()
-                navigateToMyRecipes()
+                Utils.hideKeyboard(this.requireActivity())
+                navigateToMyRecipes(newRecipe)
             }
         }
     }
@@ -203,18 +208,23 @@ class NewRecipeFragment : Fragment() {
     private fun setupIngredientButton() {
         btn_new_plus_1.setOnClickListener {
             layout_ingredient_2.visibility = View.VISIBLE
+            Utils.hideKeyboard(this.requireActivity())
         }
         btn_new_plus_2.setOnClickListener {
             layout_ingredient_3.visibility = View.VISIBLE
+            Utils.hideKeyboard(this.requireActivity())
         }
         btn_new_plus_3.setOnClickListener {
             layout_ingredient_4.visibility = View.VISIBLE
+            Utils.hideKeyboard(this.requireActivity())
         }
         btn_new_plus_4.setOnClickListener {
             layout_ingredient_5.visibility = View.VISIBLE
+            Utils.hideKeyboard(this.requireActivity())
         }
         btn_new_plus_5.setOnClickListener {
             layout_ingredient_6.visibility = View.VISIBLE
+            Utils.hideKeyboard(this.requireActivity())
         }
     }
 
@@ -239,8 +249,9 @@ class NewRecipeFragment : Fragment() {
         txt_new_source.text.clear()
     }
 
-    private fun navigateToMyRecipes() {
-        findNavController().navigateUp()
+    private fun navigateToMyRecipes(recipe: Recipe?) {
+        if (recipe != null)
+            findNavController().previousBackStackEntry?.savedStateHandle?.set("updateRecipe", recipe)
+        findNavController().popBackStack()
     }
-
 }

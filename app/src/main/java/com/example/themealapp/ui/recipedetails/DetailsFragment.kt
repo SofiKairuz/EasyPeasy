@@ -52,6 +52,11 @@ class DetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        findNavController().currentBackStackEntry?.savedStateHandle?.get<Recipe>("updateRecipe")?.let {
+            recipe = it
+        }
+
         setupRecipeDetail()
         validateDescriptionDetail()
         navigateToRecipeUri()
@@ -59,6 +64,7 @@ class DetailsFragment : Fragment() {
         speakIngredients()
         speakPreparation()
         onImageClick()
+
     }
 
     @SuppressLint("SetTextI18n")
