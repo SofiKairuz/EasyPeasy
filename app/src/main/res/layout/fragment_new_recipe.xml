@@ -99,7 +99,7 @@
 
                 <EditText
                     android:id="@+id/txt_new_ingredient_1"
-                    android:layout_width="185dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
@@ -107,7 +107,7 @@
 
                 <EditText
                     android:id="@+id/txt_new_measure_1"
-                    android:layout_width="150dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
@@ -141,7 +141,7 @@
 
                 <EditText
                     android:id="@+id/txt_new_ingredient_2"
-                    android:layout_width="185dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
@@ -149,7 +149,7 @@
 
                 <EditText
                     android:id="@+id/txt_new_measure_2"
-                    android:layout_width="150dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
@@ -182,7 +182,7 @@
 
                 <EditText
                     android:id="@+id/txt_new_ingredient_3"
-                    android:layout_width="185dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
@@ -190,7 +190,7 @@
 
                 <EditText
                     android:id="@+id/txt_new_measure_3"
-                    android:layout_width="150dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
@@ -223,7 +223,7 @@
 
                 <EditText
                     android:id="@+id/txt_new_ingredient_4"
-                    android:layout_width="185dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
@@ -231,7 +231,7 @@
 
                 <EditText
                     android:id="@+id/txt_new_measure_4"
-                    android:layout_width="150dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
@@ -264,7 +264,7 @@
 
                 <EditText
                     android:id="@+id/txt_new_ingredient_5"
-                    android:layout_width="185dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
@@ -272,7 +272,7 @@
 
                 <EditText
                     android:id="@+id/txt_new_measure_5"
-                    android:layout_width="150dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
@@ -305,7 +305,7 @@
 
                 <EditText
                     android:id="@+id/txt_new_ingredient_6"
-                    android:layout_width="185dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
@@ -313,7 +313,7 @@
 
                 <EditText
                     android:id="@+id/txt_new_measure_6"
-                    android:layout_width="150dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"

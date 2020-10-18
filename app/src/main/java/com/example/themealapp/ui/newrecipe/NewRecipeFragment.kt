@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -193,6 +194,8 @@ class NewRecipeFragment : Fragment() {
         return hasError.not()
     }
 
+    fun EditText.doubleValue() = text.toString().toDoubleOrNull() ?: 0.0
+
     private fun createRecipe() : Recipe {
         val listIngredients = listOf(
             Ingredientes(txt_new_measure_1.text.toString() + " " + txt_new_ingredient_1.text.toString(), 0.0, txt_new_measure_1.text.toString(), txt_new_ingredient_1.text.toString(), 0.0),
@@ -202,7 +205,7 @@ class NewRecipeFragment : Fragment() {
             Ingredientes(txt_new_measure_5.text.toString() + " " + txt_new_ingredient_5.text.toString(), 0.0, txt_new_measure_5.text.toString(), txt_new_ingredient_5.text.toString(), 0.0),
             Ingredientes(txt_new_measure_6.text.toString() + " " + txt_new_ingredient_6.text.toString(), 0.0, txt_new_measure_6.text.toString(), txt_new_ingredient_6.text.toString(), 0.0)
         )
-        return Recipe(txt_new_title.text.toString(), txt_new_img.text.toString(), listIngredients, txt_new_source.text.toString(), txt_new_description.text.toString(), txt_new_calories.text.toString())
+        return Recipe(txt_new_title.text.toString(), txt_new_img.text.toString(), listIngredients, txt_new_source.text.toString(), txt_new_description.text.toString(), txt_new_calories.doubleValue().toString())
     }
 
     private fun setupIngredientButton() {

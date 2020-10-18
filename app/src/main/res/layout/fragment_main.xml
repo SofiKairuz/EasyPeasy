@@ -26,12 +26,13 @@
             <SearchView
                 android:id="@+id/searchView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:iconifiedByDefault="false"
-                app:queryHint="Search recipe"
+                android:layout_height="match_parent"
+                android:background="#FFFFFF"
+                android:iconifiedByDefault="false"
+                android:focusableInTouchMode="true"
                 app:defaultQueryHint="Search recipe"
                 app:queryBackground="@android:color/transparent"
-                android:background="#FFFFFF" />
+                app:queryHint="Search recipe" />
 
         </androidx.cardview.widget.CardView>
 
