@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -36,6 +34,7 @@ class DetailsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
         mTTS = TTSManager(requireContext())
         requireArguments().let {
             recipe = it.getParcelable<Recipe>("recipe")!!
@@ -67,6 +66,41 @@ class DetailsFragment : Fragment() {
 
     }
 
+    private fun isRecipeFromAPI() = (recipe.url.startsWith("http://") || recipe.url.startsWith("https://"))
+
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.details_menu,menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when(item.itemId){
+            R.id.shareRecipe -> {
+                val intent = Intent()
+
+                var sharedText = "EasyPeasy App - ${recipe.name}\n\n"
+                if (isRecipeFromAPI())
+                    sharedText += "Hey Check out this great recipe: ${recipe.url}"
+                else {
+                    sharedText += "Ingredientes:\n"
+                    recipe.ingredients.forEach {
+                        if(!it.text.isNullOrEmpty()) sharedText += "* ${it.text}\n"
+                    }
+                    sharedText += "\nPreparacion:\n"
+                    sharedText += recipe.url
+                }
+
+                intent.action = Intent.ACTION_SEND
+                intent.putExtra(Intent.EXTRA_TEXT, sharedText)
+                intent.type = "text/plain"
+                startActivity(Intent.createChooser(intent,"Share To:"))
+                false
+            }
+            else -> false
+        }
+    }
+
     @SuppressLint("SetTextI18n")
     private fun setupRecipeDetail() {
         if (recipe.image.startsWith("http://") || recipe.image.startsWith("https://")) {
@@ -95,7 +129,7 @@ class DetailsFragment : Fragment() {
 
     private fun addRecipeToFavoritesEditRecipe() {
         btn_favorites_edit.setOnClickListener {
-            if (recipe.url.startsWith("http://") || recipe.url.startsWith("https://")) {
+            if (isRecipeFromAPI()) {
                 // GUARDO LA RECETA
                 val idReceta = viewModel.validateDuplicateRecipe(recipe.name, recipe.source, recipe.image, recipe.url) ?: 0
                 viewModel.saveRecipe(RecipeEntity(recipeId = idReceta, name = recipe.name, image = recipe.image, source = recipe.source, ingredients =  Gson().toJson(recipe.ingredients), totalCalories = recipe.totalCalories, url = recipe.url, recipeView = "FAVORITES"))
@@ -130,7 +164,7 @@ class DetailsFragment : Fragment() {
     }
 
     private fun validateDescriptionDetail() {
-        if (recipe.url.startsWith("http://") || recipe.url.startsWith("https://")) {
+        if (isRecipeFromAPI()) {
             btn_url_recipe.visibility = View.VISIBLE
             layout_preparation.visibility = View.GONE
             txt_prep_detail.visibility = View.GONE
