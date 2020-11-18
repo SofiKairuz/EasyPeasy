@@ -85,7 +85,7 @@ class DetailsFragment : Fragment() {
                 else {
                     sharedText += "Ingredientes:\n"
                     recipe.ingredients.forEach {
-                        if(!it.text.isNullOrEmpty()) sharedText += "* ${it.text}\n"
+                        if(!it.text.trim().isNullOrEmpty()) sharedText += "* ${it.text}\n"
                     }
                     sharedText += "\nPreparacion:\n"
                     sharedText += recipe.url
@@ -94,7 +94,7 @@ class DetailsFragment : Fragment() {
                 intent.action = Intent.ACTION_SEND
                 intent.putExtra(Intent.EXTRA_TEXT, sharedText)
                 intent.type = "text/plain"
-                startActivity(Intent.createChooser(intent,"Share To:"))
+                startActivity(Intent.createChooser(intent,"Compartir en:"))
                 false
             }
             else -> false
