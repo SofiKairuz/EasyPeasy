@@ -68,7 +68,7 @@ class NewRecipeFragment : Fragment() {
         txt_new_source.setText(recipe!!.source)
         txt_new_description.setText(recipe!!.url)
         txt_new_img.setText(recipe!!.image)
-        txt_new_img_gallery.setImageURI(ImageController.getImageUri(requireContext(), recipeID.toString()))
+        if (recipe!!.image.isNullOrEmpty()) txt_new_img_gallery.setImageURI(ImageController.getImageUri(requireContext(), recipeID.toString()))
         txt_new_measure_1.setText(recipe!!.ingredients[0].measure)
         txt_new_measure_2.setText(recipe!!.ingredients[1].measure)
         txt_new_measure_3.setText(recipe!!.ingredients[2].measure)
@@ -126,7 +126,11 @@ class NewRecipeFragment : Fragment() {
                 }
                 idReceta = viewModel.saveRecipe(RecipeEntity(recipeId = idReceta, name = newRecipe.name, image = newRecipe.image, source = newRecipe.source, ingredients =  Gson().toJson(newRecipe.ingredients), totalCalories = newRecipe.totalCalories, url = newRecipe.url, recipeView = "MY_RECIPES"))!!
                 Toast.makeText(requireContext(), "Se guardó la receta correctamente", Toast.LENGTH_SHORT).show()
-                saveImageToGallery(idReceta)
+                if(imageRecipe.isNullOrEmpty()) {
+                    saveImageToGallery(idReceta)
+                } else {
+                    txt_new_img_gallery.setImageResource(R.drawable.no_image)
+                }
                 cleanRecipe()
                 Utils.hideKeyboard(this.requireActivity())
                 navigateToMyRecipes(newRecipe)
@@ -185,6 +189,31 @@ class NewRecipeFragment : Fragment() {
         if ((!txt_new_ingredient_6.text.isNullOrEmpty() || !txt_new_ingredient_6.text.isNullOrBlank()) &&
             (txt_new_measure_6.text.isNullOrBlank() || txt_new_measure_6.text.isNullOrEmpty())) {
             txt_new_measure_6.error = "Este campo no puede estar vacío"
+            hasError = true
+        }
+        if ((!txt_new_measure_2.text.isNullOrEmpty() || !txt_new_measure_2.text.isNullOrBlank()) &&
+            (txt_new_ingredient_2.text.isNullOrBlank() || txt_new_ingredient_2.text.isNullOrEmpty())) {
+            txt_new_ingredient_2.error = "Este campo no puede estar vacío"
+            hasError = true
+        }
+        if ((!txt_new_measure_3.text.isNullOrEmpty() || !txt_new_measure_3.text.isNullOrBlank()) &&
+            (txt_new_ingredient_3.text.isNullOrBlank() || txt_new_ingredient_3.text.isNullOrEmpty())) {
+            txt_new_ingredient_3.error = "Este campo no puede estar vacío"
+            hasError = true
+        }
+        if ((!txt_new_measure_4.text.isNullOrEmpty() || !txt_new_measure_4.text.isNullOrBlank()) &&
+            (txt_new_ingredient_4.text.isNullOrBlank() || txt_new_ingredient_4.text.isNullOrEmpty())) {
+            txt_new_ingredient_4.error = "Este campo no puede estar vacío"
+            hasError = true
+        }
+        if ((!txt_new_measure_5.text.isNullOrEmpty() || !txt_new_measure_5.text.isNullOrBlank()) &&
+            (txt_new_ingredient_5.text.isNullOrBlank() || txt_new_ingredient_5.text.isNullOrEmpty())) {
+            txt_new_ingredient_5.error = "Este campo no puede estar vacío"
+            hasError = true
+        }
+        if ((!txt_new_measure_6.text.isNullOrEmpty() || !txt_new_measure_6.text.isNullOrBlank()) &&
+            (txt_new_ingredient_6.text.isNullOrBlank() || txt_new_ingredient_6.text.isNullOrEmpty())) {
+            txt_new_ingredient_6.error = "Este campo no puede estar vacío"
             hasError = true
         }
         if (txt_new_calories.text.isNullOrEmpty() || txt_new_calories.text.isNullOrBlank()) {
